@@ -1,0 +1,10 @@
+{
+  "name": "lorikeet",
+  "version": "1.0.0",
+  "description": "A fileExplorer",
+  "main": "main.js",
+  "dependencies": {
+    "lunr": "^2.3.5",
+    "osenv": "^0.1.5"
+  }
+}

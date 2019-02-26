@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Lorikeet</title>
+        <link rel="stylesheet" href="app.css">
+        <script src="app.js"></script>
+        <meta charset="utf-8"/>
+    </head>
+
+    <body>
+        <header id="toolBar">
+            <section class="navBtnContainer">
+                <button class="navBtn" id='backward' disabled><img src="./images/backward.png" alt=""></button>
+                <button class="navBtn" id='forward' disabled><img src="./images/forward.png" alt=""></button>
+                <button class="navBtn" id='home'><img src="./images/home.png" alt=""></button>
+            </section>
+            <section id='current-folder'></section>
+            <input type="search" id="search" results="3" placeholder="Search"/>
+        </header>
+        <!-- 显示文件主区域 -->
+        <section id="main-area"></section>
+        <!-- 单个文件模板 -->
+        <template id='fileItem-template'>
+            <div class="fileItem">
+                <img src="" alt="" class="fileIcon">
+                <div class="fileName"></div>
+            </div>
+        </template>
+    </body>
+</html>
