@@ -50,14 +50,12 @@ function displayFile(file){
     if(file.type == 'directory'){
         // 为文件夹添加双击监听
         fileItem.addEventListener('dblclick', (e)=>{
-            // let folderPath = e.currentTarget.getAttribute('folderpath');
             pageStack.splice(pageIndex + 1, pageStack.length - pageIndex - 1);
             pageStack.push(file.path);
             pageIndex                = pageStack.length - 1;
             btnState.canMoveBackward = true;
             loadDirectory(file.path);
         }, true);
-        // fileItem.setAttribute('folderpath', file.path);
     } else {
         fileItem.addEventListener('dblclick', ()=>{
             fileSystem.openFile(file.path);
