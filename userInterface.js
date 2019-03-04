@@ -34,7 +34,7 @@ Object.defineProperty(btnState, 'canMoveBackward', {
 });
 
 // 显示文件、文件夹
-function displayFile(file){
+function displayFile(file, files){
     const mainArea = document.getElementById('main-area');
     const template = document.querySelector('#fileItem-template');
     let   clone    = document.importNode(template.content, true);
@@ -61,8 +61,31 @@ function displayFile(file){
             fileSystem.openFile(file.path);
         }, false);
     }
-    
+    // 为文件添加选中效果
+    fileItem.addEventListener('click', (e)=>{
+        // console.log('click');
+        clearSelected();
+        let fileIcon = e.currentTarget.querySelector('.fileIcon');
+        let fileName = e.currentTarget.querySelector('.fileName');
+        fileIcon.classList.add('selectedIcon');
+        fileName.classList.add('selectedName');
+    });
     mainArea.appendChild(clone);
+}
+// 清除选中状态
+function clearSelected(files){
+    let selectedIcons = document.getElementsByClassName('selectedIcon');
+    if(selectedIcons.length > 0){
+        for(let i=0, length=selectedIcons.length; i<length; i++){
+            selectedIcons[i].classList.remove('selectedIcon');
+        }
+    } else {
+        return;
+    }
+    let selectedNames = document.getElementsByClassName('selectedName');
+    for(let i=0, length=selectedNames.length; i<length; i++){
+        selectedNames[i].classList.remove('selectedName');
+    }
 }
 
 function displayFiles(err, files){
@@ -70,7 +93,7 @@ function displayFiles(err, files){
         return alert('无法显示您的文件');
     }
     for(let file of files){
-        displayFile(file);
+        displayFile(file), files;
     }
 }
 

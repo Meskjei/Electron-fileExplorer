@@ -85,9 +85,10 @@ html, body{
     justify-content: center;
     align-items    : center;
     text-align     : center;
-    width          : 18rem;
+    width          : 16rem;
     height         : 20rem;
-    margin-bottom  : 1rem;
+    margin         : .5rem 1rem;
+    border-radius  : .5rem;
 }
 
 .fileItem .fileIcon{
@@ -96,12 +97,23 @@ html, body{
 }
 
 .fileItem .fileName{
+    padding           : .3rem;
+    border-radius     : .5rem;
     margin-top        : 1rem;
     max-width         : 80%;
     font-size         : 1.5rem;
     overflow          : hidden;
     text-overflow     : ellipsis;
     display           : -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
+}
+
+.selectedName{
+    background: #1953E5;
+    color     : white !important;
+}
+
+.selectedIcon{
+    background: #e6e6e6;
 }
