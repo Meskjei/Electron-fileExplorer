@@ -109,11 +109,11 @@ html, body{
     -webkit-box-orient: vertical;
 }
 
-.selectedName{
-    background: #1953E5;
-    color     : white !important;
+.selected .fileIcon{
+    background: #e6e6e6;
 }
 
-.selectedIcon{
-    background: #e6e6e6;
+.selected .fileName{
+    background: #1953E5;
+    color     : white !important;
 }

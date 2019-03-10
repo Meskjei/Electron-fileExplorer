@@ -1,9 +1,11 @@
 'use strict'
-const fs           = require('fs');
-const search       = require('./search.js');
-const EventEmitter = require('events');
-const fileSystem   = require('./fileSystem.js');
-let   pageStack    = [];                          //页面栈
+const { remote }         = require('electron')
+const { Menu, MenuItem } = remote
+const fs                 = require('fs');
+const search             = require('./search.js');
+const EventEmitter       = require('events');
+const fileSystem         = require('./fileSystem.js');
+let   pageStack          = [];                          //页面栈
 pageStack.push(fileSystem.getUserHomeFolder()); //最底层默认为home
 let pageIndex           = 0;                   //页面索引
 let btnStateChangeEvent = new EventEmitter();
@@ -61,30 +63,54 @@ function displayFile(file, files){
             fileSystem.openFile(file.path);
         }, false);
     }
+    // 当前文件的位置
+    let originPosition = {
+        x         : 0,
+        y         : 0,
+        hasBeenSet: false
+    }
     // 为文件添加选中效果
-    fileItem.addEventListener('click', (e)=>{
-        // console.log('click');
+    fileItem.addEventListener('mousedown', (e)=>{
         clearSelected();
-        let fileIcon = e.currentTarget.querySelector('.fileIcon');
-        let fileName = e.currentTarget.querySelector('.fileName');
-        fileIcon.classList.add('selectedIcon');
-        fileName.classList.add('selectedName');
+        e.currentTarget.classList.add('selected');
+    });
+    // 为文件添加拖拽
+    fileItem.addEventListener('mousedown', (e)=>{
+        if(e.button != 0 ){return;}
+        e.preventDefault();
+        if(!originPosition.hasBeenSet){
+            originPosition.x          = e.clientX;
+            originPosition.y          = e.clientY;
+            originPosition.hasBeenSet = true;
+        }
+        e.currentTarget.style.position = 'relative';
+        document.addEventListener('mousemove', changePosition);
+    });
+    // 为文件取消拖拽监听
+    document.addEventListener('mouseup', (e)=>{
+        document.removeEventListener('mousemove', changePosition);
+    });
+
+    function changePosition(e){
+        fileItem.style.top  = (e.clientY - originPosition.y) + 'px';
+        fileItem.style.left = (e.clientX - originPosition.x) + 'px';
+    }
+    // 右键菜单
+    fileItem.addEventListener('mousedown', (e)=>{
+        if(e.button == 2){
+            e.preventDefault();
+            setFileItemRightkeyMenu(file.path);
+        }
     });
     mainArea.appendChild(clone);
 }
+
+
 // 清除选中状态
-function clearSelected(files){
-    let selectedIcons = document.getElementsByClassName('selectedIcon');
-    if(selectedIcons.length > 0){
-        for(let i=0, length=selectedIcons.length; i<length; i++){
-            selectedIcons[i].classList.remove('selectedIcon');
-        }
-    } else {
-        return;
-    }
-    let selectedNames = document.getElementsByClassName('selectedName');
-    for(let i=0, length=selectedNames.length; i<length; i++){
-        selectedNames[i].classList.remove('selectedName');
+function clearSelected(){
+    let selectedItems = document.getElementsByClassName('selected');
+    for(let item of selectedItems){
+        item.classList.remove('selected');
     }
 }
 
@@ -203,7 +229,7 @@ function resetFileter(){
         items[i].style = null;
     }
 }
-
+// 解析出后缀
 function parsePostFix(fileName){
     let postFix = fileName.split('.');
     if(postFix.length > 0){
@@ -212,7 +238,7 @@ function parsePostFix(fileName){
         return '.file';
     }
 }
-
+// 显示图标
 function displayIcon(clone, fileName){
     let postFix = parsePostFix(fileName);
     if(postFix != undefined){
@@ -225,6 +251,32 @@ function displayIcon(clone, fileName){
             clone.querySelector('img').src = `images/file.png`;
         }
     }
+}
+
+function setFileItemRightkeyMenu(filePath){
+    const menu = new Menu()
+    menu.append(new MenuItem({ 
+        label: '移到废纸篓', click() {
+            let shell  = require('electron').shell;
+            let result = shell.moveItemToTrash(filePath);
+            if(!result){
+                shell.beep();
+                remote.dialog.showMessageBox({type: 'error', title:'错误', message: '您没有删除该文件的权限'});
+            } else {
+                let audio = new Audio('./Audio/delete.wav');
+                audio.play();
+                loadDirectory(pageStack[pageIndex]);
+            }
+            
+        } 
+    }));
+    menu.append(new MenuItem({ 
+        label: '刷新',
+        click(){
+            loadDirectory(pageStack[pageIndex]);
+        }
+     }));
+    menu.popup({ window: remote.getCurrentWindow() })
 }
 
 module.exports = {displayFiles, loadDirectory, setBtnHandler, bindSearchField, resetFileter, filterResults};
